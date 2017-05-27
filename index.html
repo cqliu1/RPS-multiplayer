@@ -8,8 +8,56 @@
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+	<div class="container text-center">
+
+		<h1> Rock Paper Scissors </h1>
 	
+		<div id="players">
+			<div id="player1" class="col-md-3 pull-left text-center">
+				<h2>Player 1: <span class="name"></span></h2>
+				<h3>Wins: <span class="wins"></span></h3>
+
+				<div class="selection">
+				</div>
+
+				<div class="options">
+					<button class="selection rock" data-player="1" data-selection="r"></button>
+					<button class="selection paper" data-player="1" data-selection="p"></button>
+					<button class="selection scissors" data-player="1" data-selection="s"></button>
+				</div>
+			</div>
+
+			<div class="game col-md-6">
+				<h3>Ties: <span class="id"></span></h3>
+				<p id="status"></p>
+
+				<div class="p1-selection">
+				</div>
+				<div class="p2-selection">
+				</div>
+			</div>
+
+			<div id="player2" class="col-md-3 pull-right text-center">
+				<h2>Player 2: <span class="name"></span></h2>
+				<h3>Wins: <span class="wins"></span></h3>
+
+				<div class="selection">
+				</div>
+
+				<div class="options">
+					<button class="selection rock" data-player="2" data-selection="r"></button>
+					<button class="selection paper" data-player="2" data-selection="p"></button>
+					<button class="selection scissors" data-player="2" data-selection="s"></button>
+				</div>
+
+			</div>
+		</div>
+		
+
+	</div>
+
 	<script src="https://code.jquery.com/jquery-2.2.4.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.0.0/firebase.js"></script>
 	<script type="text/javascript" src="assets/javascript/app.js"></script>
 </body>
 </html>
