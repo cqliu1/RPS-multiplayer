@@ -1,0 +1,9 @@
+.selection {
+	width: 150px;
+	height: 150px;
+}
+
+.selection img {
+	width: 120px;
+	height: auto;
+}
