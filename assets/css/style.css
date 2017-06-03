@@ -7,3 +7,8 @@
 	width: 120px;
 	height: auto;
 }
+
+.selected {
+	width: 250px;
+	height: 250px;
+}

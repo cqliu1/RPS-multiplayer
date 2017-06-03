@@ -19,7 +19,7 @@ $(document).ready(function(){
 
 	var ties = 0;
 
-	var thisPlayer = "";
+	var thisPlayer = localStorage.getItem("player");
 
 	var status = "";
 
@@ -58,69 +58,57 @@ $(document).ready(function(){
 		ties = 0;
 
 		thisPlayer = "";
+		localStorage.removeItem("player");
 
 		p1Online = false;
 		p2Online = false;
 
-		database.ref().update({
-			status: "Click join to start a new game!"
-		});
+		$("#status").text("Click join to start a new game!");
+
 		$(".join").show().removeClass("disabled");
 		$(".selection").removeClass("disabled");
 		$(".player-select").hide();
+		$(".score").hide();
+
+		$("#p1-selection").html("");
+		$("#p2-selection").html("");	
 	}
 
 	function rps(selection1, selection2) {
+
+		$("#p1-selection").html("<img class='selected' src='assets/images/"+selection1+"-left.png'>");
+		$("#p2-selection").html("<img class='selected' src='assets/images/"+selection2+"-right.png'>");
 
 		// check which player wins
 		if(selection1 === selection2) {
 			ties++;
 			$("#status").text("It's a tie!");
-		} else if(selection1 === "r") {
-			if(selection2 === "p") {
+		} else if(selection1 === "rock") {
+			if(selection2 === "paper") {
 				p2Wins++;
 				$("#status").text("Player 2 wins!");
-				database.ref().update({
-					p2Wins: p2Wins,
-					status: "Player 2 wins!"
-				});
 			}
-			else if(selection2 === "s") {
+			else if(selection2 === "scissors") {
 				p1Wins++;
-				database.ref().update({
-					p1Wins: p1Wins,
-					status: "Player 1 wins!"
-				});
+				$("#status").text("Player 1 wins!");
 			}
-		} else if(selection1 === "p") {
-			if(selection2 === "r") {
+		} else if(selection1 === "paper") {
+			if(selection2 === "rock") {
 				p1Wins++;
-				database.ref().update({
-					p1Wins: p1Wins,
-					status: "Player 1 wins!"
-				});
+				$("#status").text("Player 1 wins!");
 			}
-			else if(selection2 === "s") {
+			else if(selection2 === "scissors") {
 				p2Wins++;
-				database.ref().update({
-					p2Wins: p2Wins,
-					status: "Player 2 wins!"
-				});
+				$("#status").text("Player 2 wins!");
 			}
-		} else if(selection1 === "s") {
-			if(selection2 === "r") {
+		} else if(selection1 === "scissors") {
+			if(selection2 === "rock") {
 				p2Wins++;
-				database.ref().update({
-					p2Wins: p2Wins,
-					status: "Player 2 wins!"
-				});
+				$("#status").text("Player 2 wins!");
 			}
-			else if(selection2 === "p") {
+			else if(selection2 === "paper") {
 				p1Wins++;
-				database.ref().update({
-					p1Wins: p1Wins,
-					status: "Player 1 wins!"
-				});
+				$("#status").text("Player 1 wins!");
 			}
 		}
 
@@ -138,6 +126,26 @@ $(document).ready(function(){
 	$(".selection").on("click", function() {
 		if(!$(this).hasClass("disabled")) {
 
+			var selection = $(this).attr("data-selection");
+			console.log("Player chose ",selection);
+
+			if(thisPlayer === "1") {
+				$("#p1-selection").html("<img class='selected' src='assets/images/question.png'>");
+
+				database.ref().update({
+					p1Selection: selection,
+					p1NewSelection: true
+				});
+
+				
+			} else if(thisPlayer === "2") {
+				$("#p2-selection").html("<img class='selected' src='assets/images/question.png'>");
+
+				database.ref().update({
+					p2Selection: selection,
+					p2NewSelection: true
+				});
+			}
 		}
 	});
 
@@ -149,20 +157,22 @@ $(document).ready(function(){
 			if(player === "1" && !p1Online) {
 				thisPlayer = player;
 
-				database.ref().set({
+				database.ref().update({
 					p1Online: true,
 					p1Wins:0,
 					p1Selection:"",
 					ties:0
 				});
 
+				localStorage.setItem("player","1");
+
 				$("#player1 .player-select").show();
 				$("#player1 .score").show();
-				$("#player2 selection").addClass("disabled");
+				$("#player2 .selection").addClass("disabled");
 			} else if (player === "2" && !p2Online) {
 				thisPlayer = player;
 
-				database.ref().set({
+				database.ref().update({
 					p2Online: true,
 					p2Wins:0,
 					p1Selection:""
@@ -170,7 +180,9 @@ $(document).ready(function(){
 
 				$("#player2 .player-select").show();
 				$("#player2 .score").show();
-				$("#player1 selection").addClass("disabled");
+				$("#player1 .selection").addClass("disabled");
+
+				localStorage.setItem("player","1");
 			}
 
 			$(this).hide();
@@ -178,13 +190,11 @@ $(document).ready(function(){
 		}	
 	});
 
-	// // when player leaves the page
-	// $(window).on("unload", function() {
-	// 	// clears all game data when either player leaves the game
-	// 	database.ref().remove();
-
-	// 	resetGame();
-	// });
+	// when player leaves the page
+	$(window).on("unload", function() {
+		// clears all game data when either player leaves the game
+		database.ref().remove();
+	});
 
 	database.ref().on('value', function(snapshot) {
 		console.log(snapshot.val());
@@ -193,13 +203,15 @@ $(document).ready(function(){
 
 		if(data !== null) {
 			p1Online = data.p1Online;
-			p1Wins = data.p1Wins;
+			p1Wins = parseInt(data.p1Wins);
 			p2Online = data.p2Online;
-			p2Wins = data.p2Wins;
-			ties = data.ties;
-			status = data.status;
+			p2Wins = parseInt(data.p2Wins);
+			ties = parseInt(data.ties);
 			p1Selection = data.p1Selection;
 			p2Selection = data.p2Selection;
+		} 
+		else {
+			resetGame();
 		}
 
 		console.log("selections:",p1Selection,p2Selection);
@@ -235,12 +247,9 @@ $(document).ready(function(){
 		}
 
 		updateScores();
-		$("#status").text(status);
 
 		if(p1Online && p2Online) {
 			$(".score").show();
-		} else {
-			resetGame();
 		}
 	});
 
